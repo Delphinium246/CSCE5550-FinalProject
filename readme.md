@@ -13,3 +13,16 @@ In this project we will develop a desktop application that communicates over HTT
 This ransomware will use a http service that can be utilized by the attacker to manage the ransomware attack after attackers file are encrypted. The client and http service together can help in creating a focused attack example, decrypting specific file type, decrypting certain locations etc. The client and remote service together can be used to facilitate decryption after all attackers demands are fulfilled. 
 
 ![image](https://user-images.githubusercontent.com/80862273/111945861-7068fe80-8aa8-11eb-8986-1b5a7c4cdc70.png)
+
+<h2> How to user </h2>
+
+This project has two major components
+1. Attacker program (attacker.py): This program creates the attackers key pair and stores them to /keystore in users /Documents. This program is also reponsible for decrypting victims encrypted private key.
+2. Victim program (ransomware.py): This program using attackers public key ./public.pem carrys out the ransomware attack. Once the attack is complete, this program also looks at desktop for the unlock key to decrypt the system.
+
+<h3> Attack Instructions </h3>
+1. Execute ransomware.py with public.pem in the same folder. This will result in encryption of all user files.
+2. Share the 'Email_Me_After_Paying.pemcry' with attacker after following instructions from RANSOM_NOTE.TXT on Desktop.
+3. Execute attacker.py with 'Email_Me_After_Paying.pemcry' in the same folder and this will generate a new pem file 'PUT_ON_DESKTOP.pem'.
+4. Share the PUT_ON_DESKTOP.pem file with victim and place this file on victims Desktop.
+5. attacker will automatically run decryption and end program after completion.
