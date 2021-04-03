@@ -21,8 +21,9 @@ This project has two major components
 2. Victim program (ransomware.py): This program using attackers public key ./public.pem carrys out the ransomware attack. Once the attack is complete, this program also looks at desktop for the unlock key to decrypt the system.
 
 <h3> Attack Instructions </h3>
+
 1. Execute ransomware.py with public.pem in the same folder. This will result in encryption of all user files.
 2. Share the 'Email_Me_After_Paying.pemcry' with attacker after following instructions from RANSOM_NOTE.TXT on Desktop.
 3. Execute attacker.py with 'Email_Me_After_Paying.pemcry' in the same folder and this will generate a new pem file 'PUT_ON_DESKTOP.pem'.
 4. Share the PUT_ON_DESKTOP.pem file with victim and place this file on victims Desktop.
-5. attacker will automatically run decryption and end program after completion.
+5. attacker.py will automatically run decryption and end program after completion.
